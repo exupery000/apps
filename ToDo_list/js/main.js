@@ -195,7 +195,7 @@ main.onclick = function (event) {
         //найдем положение текста
         let text = document.getElementById(`task${id}`);
 
-        let newText = prompt('Введите задачу', text);
+        let newText = prompt('Введите задачу', text.innerText);
         if (newText === null || newText === undefined) {
             console.log('просто отмена', newText);
             return
