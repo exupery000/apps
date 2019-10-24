@@ -34,6 +34,7 @@ const toDoList = {
             if (answer) {
                 this.tasks.splice(deletedIndex, 1)
             } else {
+                console.log('отмена');
                 return -1;
             }
         }
@@ -47,11 +48,6 @@ const toDoList = {
                 isNotUnique = true;
             }
         });
-
-        if (newText == null || newText == undefined) {
-            return
-        }
-
 
         if (editedIndex === -1) {
             console.log('Вы пытаетесь редактировать несуществующую запись');
@@ -195,6 +191,10 @@ main.onclick = function (event) {
         let text = document.getElementById(`task${id}`);
 
         let newText = prompt('Введите задачу', 'новая задача');
+        if (newText === null || newText === undefined) {
+            console.log('просто отмена', newText);
+            return
+        }
 
         let func = toDoList.editTask(id, newText);
         if (func === -1) {
@@ -203,7 +203,6 @@ main.onclick = function (event) {
             console.log('Вы пытаетесь редактировать несуществующую запись');
         } else if (func === -3) {
             console.log('отмена изменения');
-            return;
         } else {
             text.innerHTML = newText;
         }
