@@ -24,7 +24,7 @@ const toDoList = {
             });
         }
     },
-    
+
 
     deleteTask(UniqueID) {
         let deletedIndex = this.findAnIndex(UniqueID);
@@ -132,6 +132,10 @@ Object.freeze(toDoList);
 addNewTaskButton.onclick = function () {
     let access = document.getElementById("main");
     let task = prompt('Введите задачу', 'новая задача');
+    if (task === null || task === undefined) {
+        console.log('отмена');
+        return
+    }
     let func = toDoList.newTask(task);
     let ID = toDoList.counterObj.counter;
     if (func === -1) {
