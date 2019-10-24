@@ -211,8 +211,6 @@ main.onclick = function (event) {
         } else {
             text.innerHTML = newText;
         }
-
-
     }
 
 
