@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /*
+        ToDo list (данные)
+        Вам нужно создать список задач, который умеет:
+
+        добавлять новые задачи и проверять их уникальность. У каждой задачи есть статус, время создания и текст
+        удалять задачу, но с условием (тут передаете в качестве аргумента confirm)
+        редактировать задачу (тоже спрашиваете нужно ли сохранить изменения)
+        выводить общее количество задач, сколько выполнили и сколько осталось
+
+
+        Ах, да! Это не просто объект - вам нужно сделать так, чтоб в него нельзя было вносить изменения, чтоб никто не переписал случайно его методы)
+
+        Если что забыл - пишите
+        */
+
+        const toDoList = {
+            tasks: [],
+            counterObj: {
+                counter: 0
+            },
+
+
+            newTask(text) {
+                let isNotUnique = false;
+                this.tasks.forEach(elem => {
+                    if (elem.text === text) {
+                        isNotUnique = true;
+                    }
+                });
+
+                if (isNotUnique) {
+                    console.log('Такая запись уже есть');
+                } else {
+                    this.tasks.push({
+                        UniqueID: this.counterObj.counter,
+                        status: false,
+                        time: new Date().getTime(),
+                        text: text
+                    });
+                    this.counterObj.counter++;
+
+                }
+
+            },
+
+            deleteTask(UniqueID) {
+                let deletedIndex = this.findIndex(UniqueID);
+
+                if (deletedIndex === -1) {
+                    console.log('Вы пытаетесь удалить несуществующую запись');
+                } else {
+                    let answer = confirm('Удалить запись?');
+                    if (answer) {
+                        this.tasks.splice(deletedIndex, 1)
+                    }
+                }
+            },
+
+            editTask(UniqueID, newText) {
+                let editedIndex = this.findIndex(UniqueID);
+
+                if (editedIndex === -1) {
+                    console.log('Вы пытаетесь редактировать несуществующую запись');
+                } else {
+                    let answer = confirm('Изменить запись?');
+                    if (answer) {
+                        this.tasks[editedIndex].text = newText;
+                    }
+                }
+            },
+
+            completeThisTask(UniqueID) {
+                let completeIndex = this.findIndex(UniqueID);
+
+                if (completeIndex === -1) {
+                    console.log('Вы пытаетесь выполнить несуществующую запись');
+                } else {
+                    this.tasks[completeIndex].status = true;
+                }
+            },
+
+            unCompleteThisTask(UniqueID) {
+                let completeIndex = this.findIndex(UniqueID);
+
+                if (completeIndex === -1) {
+                    console.log('Вы пытаетесь отменить выполнение несуществующей записи');
+                } else {
+                    this.tasks[completeIndex].status = false;
+                }
+
+
+            },
+
+            findIndex(UniqueID) {
+                let resIndex = -1;
+                this.tasks.forEach((elem, index) => {
+                    if (elem.UniqueID === UniqueID) {
+                        resIndex = index
+                    }
+                });
+                return resIndex;
+            },
+
+
+
+            totalCompletedTasks() {
+                let result = this.tasks.reduce((acum, elem) => {
+                    if (elem.status === true) {
+                        acum++
+                    }
+                    return acum
+                }, 0);
+                return result;
+            },
+
+            totalneedToDoTasks() {
+                let result = this.tasks.reduce((acum, elem) => {
+                    if (elem.status === false) {
+                        acum++
+                    }
+                    return acum
+                }, 0);
+                return result;
+            },
+
+            totalInfo() {
+                let resArr = [];
+                resArr.push(['total', this.tasks.length]);
+                resArr.push(['completed', this.totalCompletedTasks()]);
+                resArr.push(['needToDo', this.totalneedToDoTasks()]);
+
+                return resArr;
+            },
+
+        };
+
+
+
+
+        Object.freeze(toDoList);
+        //Freeze: делает объект неизменным, что означает, что никакое 
+        //изменение в разрешенное свойство не допускается, 
+        //если только они не являются объектами
+        //counterObj: {counter: 0} это объект
+        //заморозка на него (как на внуковый элемент) не распространяется
+
+
+        // добавим 4 таска в наш список
+        toDoList.newTask('shoping');
+        toDoList.newTask('snooping');
+        toDoList.newTask('vanished');
+        toDoList.newTask('banished');
+
+
+        // попробуем добавить существующий таск
+        toDoList.newTask('snooping');
+        console.log('***');
+
+
+        // удалим один таск
+        toDoList.deleteTask(0);
+
+
+        // попробуем удалить несуществующий таск
+        toDoList.deleteTask(0);
+        toDoList.deleteTask(100);
+        console.log('***');
+
+
+        // добавим новый таск три раза подряд, 4-й лог
+        toDoList.newTask('drinking');
+        toDoList.newTask('drinking');
+        toDoList.newTask('drinking');
+        console.log('***');
+
+
+        // изменим таск
+        toDoList.editTask(4, 'BLAME');
+
+
+        // изменим несуществующий таск
+        toDoList.editTask(25, 'BLAME');
+        toDoList.editTask(0, 'BLAME');
+        console.log('***');
+
+
+        // выполним таск
+        toDoList.completeThisTask(1);
+
+
+        // отменим выполнение
+        toDoList.unCompleteThisTask(1);
+
+
+        // выполним таск
+        toDoList.completeThisTask(1);
+
+
+        // выполним несуществующий таск
+        toDoList.completeThisTask(30);
+        toDoList.unCompleteThisTask(0);
+        console.log('***');
+
+
+        //Общая информация по списку
+        //вывел массивом
+        console.log(`общая информация по списку`);
+        console.log(toDoList.totalInfo());
+
+
+        //Общее число выполненных задач
+        console.log(`общее число выполненных задач ${toDoList.totalCompletedTasks()}`);
+
+
+        //Общее число невыполненных задач
+        console.log(`общее число невыполненных задач ${toDoList.totalneedToDoTasks()}`);
+
+
+        // метод поиска индекса нужного элемента по ID
+        console.log(`поиск элемента массива по ID`);
+        console.log(toDoList.findIndex(2));
+        console.log('***');
+
+
+        console.log(toDoList.tasks);
+        //попытаемся переписать свойство
+        toDoList.tasks = 'ge'
+        //попытаемся переписать свойство
+        toDoList.totalCompletedTasks = 0;
+        //убедимся что свойства и методы не изменены
+        console.log(toDoList);
+
+
+    </script>
+
+</body>
+
+</html>

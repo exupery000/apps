@@ -1,0 +1,82 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  text-decoration: none;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  font-family: 'Roboto';
+}
+@font-face {
+  font-family: Abold;
+  src: url(../fonts/Acrom-Bold.ttf);
+}
+section.main-app {
+  background-color: #e0dcd7;
+  padding: 5px 5px;
+}
+section.main-app .container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 15px 15px;
+}
+section.main-app .container .main {
+  background-color: #af7737;
+  padding: 15px 15px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+section.main-app .container .main .title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 25px;
+}
+section.main-app .container .main .body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+section.main-app .container .main .body .number-const {
+  padding: 5px;
+  min-width: 60px;
+  text-align: center;
+}
+section.main-app .container .main .body .task-const {
+  padding: 5px;
+  width: auto;
+}
+section.main-app .container .main .body .option-const {
+  padding: 5px;
+  width: 150px;
+  text-align: center;
+}
+section.main-app .container .main .task-self {
+  display: flex;
+  flex-direction: row;
+  margin-top: 5px;
+  justify-content: space-between;
+  border: 1px solid white;
+  border-radius: 5px;
+}
+section.main-app .container .main .task-self .number {
+  padding: 5px;
+  min-width: 60px;
+  text-align: center;
+}
+section.main-app .container .main .task-self .task {
+  padding: 5px;
+  width: calc(100% - 60px - 150px);
+  text-align: left;
+}
+section.main-app .container .main .task-self .option {
+  padding: 5px;
+  width: 150px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+section.main-app .addButton {
+  display: flex;
+  justify-content: center;
+}
