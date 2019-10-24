@@ -24,6 +24,7 @@ const toDoList = {
             });
         }
     },
+    
 
     deleteTask(UniqueID) {
         let deletedIndex = this.findAnIndex(UniqueID);
