@@ -16,6 +16,8 @@
     src: url(../fonts/Acrom-Bold.ttf);
 }
 
+@import url('https://fonts.googleapis.com/css?family=Lobster&display=swap');
+
 @roboto : 'Roboto';
 // @raleway : 'Raleway';
 @raleway : 'Noto Sans';
@@ -28,6 +30,7 @@ section.main-app {
         max-width: 1150px;
         margin: 0 auto;
         padding: 15px 15px;
+        
 
         .main {
             background-color: rgb(175, 119, 55);
@@ -76,6 +79,7 @@ section.main-app {
                 flex-direction: row;
                 margin-top: 5px;
                 justify-content: space-between;
+                align-items: center;
                 border: 1px solid white;
                 border-radius: 5px;
 
@@ -92,6 +96,8 @@ section.main-app {
                     width: calc(100% - 60px - 150px);
                     text-align: left;
                     //background-color: rgb(8, 8, 104);
+                    font-family: 'Lobster', cursive;
+                    font-size: 20px;
                 }
 
                 .option {
@@ -104,9 +110,56 @@ section.main-app {
                     flex-direction: row;
                     justify-content: space-around;
 
+                    .delete-button {
+                        width: 45px;
+                        height: 45px;
+                        font-size: 30px;
+                        color: black;
+                        border-radius: 50%;
+                        border: 1px solid white;
+                        background-color: transparent;
+                    }
+
+                    .edit-button {
+                        width: 45px;
+                        height: 45px;
+                        font-size: 30px;
+                        color: black;
+                        border-radius: 50%;
+                        border: 1px solid white;
+
+                        background-color: transparent;
+                    }
+
+                    .flag-button {
+                        background-color:red;
+                        width: 45px;
+                        height: 45px;
+                        font-size: 30px;
+                        color: black;
+                        border-radius: 50%;
+                        border: 1px solid white;
+                        
+                    }
+
+
                 }
 
 
+            }
+
+        }
+
+        .global-info {
+            max-width: 250px;
+            background-color: rgb(175, 119, 55);
+            padding: 15px 15px;
+            margin: 15px auto 0px auto;
+            border-radius: 10px;
+            .flex {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
             }
 
         }
@@ -115,6 +168,30 @@ section.main-app {
     .addButton {
         display: flex;
         justify-content: center;
+        text-align: center;
+        width: 50px;
+        height: 50px;
+        background-color: #4b44b1;
+        border-radius: 50%;
+        border: 1px solid white;
+        margin: 10px auto;
+
+
+
+        
+        #addNewTaskButton {
+            text-align: center;
+
+
+            
+            border: none;
+            
+            color: inherit;
+            background-color: transparent;
+
+            font-size: 30px;
+            color: rgb(12, 145, 12);
+        }
 
     }
 }

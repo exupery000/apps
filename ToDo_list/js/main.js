@@ -92,8 +92,6 @@ const toDoList = {
         return resIndex;
     },
 
-
-
     totalCompletedTasks() {
         let result = this.tasks.reduce((acum, elem) => {
             if (elem.status === true) {
@@ -146,22 +144,15 @@ addNewTaskButton.onclick = function () {
             <div class="number" id="number${ID}">${ID}</div> 
             <div class="task" id="task${ID}">${task}</div> 
             <div class="option">
-                <div> <button class="delete-button">&#10008; </button></div> 
-                <div> <button class="edit-button">edit</button></div>
+                <div> <button class="delete-button">&#10006;</button></div> 
+                <div> <button class="flag-button" id='flag${ID}'>&#10004;	</button></div>
+                <div> <button class="edit-button">&#9998;</button></div>
             </div> 
         </div>`;
+        setAllInfo();
+
     }
 }
-
-// deleteTaskButton.onclick = function () {
-//     let access  = document.getElementById(`main`);
-//     let task = prompt('Введите задачу', 'новая задача');
-//     toDoList.newTask(task);
-//     let ID = toDoList.counterObj.counter;
-
-//     let parent = document.getElementById("main");
-//     let child = document.getElementById("id1");
-
 
 
 main.onclick = function (event) {
@@ -174,8 +165,10 @@ main.onclick = function (event) {
 
 main.onclick = function (event) {
     if (event.target.className !== 'edit-button' &&
-        event.target.className !== 'delete-button') {
-        return
+        event.target.className !== 'delete-button' &&
+        event.target.className !== 'flag-button'
+    ) {
+        return;
     };
 
     //ограничим область действия
@@ -190,6 +183,7 @@ main.onclick = function (event) {
             return
         } else {
             task.remove();
+            setAllInfo();
         }
     } else if (event.target.className === 'edit-button') {
         //найдем положение текста
@@ -199,7 +193,7 @@ main.onclick = function (event) {
         if (newText === null || newText === undefined) {
             console.log('просто отмена', newText);
             return
-        }
+        };
 
         let func = toDoList.editTask(id, newText);
         if (func === -1) {
@@ -210,8 +204,34 @@ main.onclick = function (event) {
             console.log('отмена изменения');
         } else {
             text.innerHTML = newText;
-        }
-    }
+        };
+
+    } else if (event.target.className === 'flag-button') {
+        let index = toDoList.findAnIndex(id);
+        let flag = toDoList.tasks[index].status;
+        console.log(flag);
+
+
+
+        if (flag === false) {
+            toDoList.completeThisTask(id);
+            let access = document.getElementById(`flag${id}`);
+            access.style.backgroundColor = "green";
+            setAllInfo();
+
+
+
+
+        } else {
+            toDoList.unCompleteThisTask(id);
+            let access = document.getElementById(`flag${id}`);
+            access.style.backgroundColor = "red";
+            setAllInfo()
+        };
+
+
+    };
+
 
 
 
@@ -222,6 +242,13 @@ main.onclick = function (event) {
 };
 
 
+function setAllInfo() {
+    let allTasks = document.getElementById(`total-amount`);
+    allTasks.innerHTML = toDoList.tasks.length;
 
-//     access.innerHTML += `<div class="task-self"> <div class="number">${ID}</div> <div class="task">${task}</div> <div class="option">&#10008; </div> </div>`;
-// }
+    let needToDo = document.getElementById(`total-need-to-do`);
+    needToDo.innerHTML = toDoList.totalneedToDoTasks();
+
+    let completed = document.getElementById(`total-complete`);
+    completed.innerHTML = toDoList.totalCompletedTasks();
+};
