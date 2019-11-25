@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Currency converter</title>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .out {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+
+    <h1>Currency converter</h1>
+
+    <form class="content">
+        <input class="in" type="text" placeholder="Enter value in UA Hrivna">
+        <select>
+            <option disabled selected>Chose a currency</option>
+        </select>
+        <input type="submit" value="Convert">
+    </form>
+
+    <p class="out"></p>
+
+    <script>
+        const mainIn = document.querySelector('.in');
+        const mainOut = document.querySelector('.out');
+        const mainSelect = document.querySelector('select');
+        const form = document.querySelector('form');
+
+        const curentCurencyInfo = [];
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://old.bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
+        xhr.send();
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const mainData = JSON.parse(xhr.responseText);
+                console.log(mainData);
+                mainData.forEach(elem => {
+                    const newOption = document.createElement('option');
+                    newOption.value = elem.rate;
+                    newOption.text = `${elem.txt}, ${elem.cc}`;
+                    mainSelect.append(newOption);
+                });
+            }
+        };
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            console.log(mainSelect.value);
+            console.log(mainIn.value);
+            const res = Math.round(mainIn.value / mainSelect.value * 1000) / 1000;
+            mainOut.innerText = `${res}`;
+        });
+    </script>
+
+</body>
+
+</html>
