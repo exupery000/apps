@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <table border="1" cellpadding="5">
+    </table>
+
+
+    <script>
+        function dataMapper(obj, exclude) {
+            Object.keys(obj).forEach(key => {
+                if (exclude.includes(key)) {
+                    delete obj[key];
+                }
+            })
+            return obj;
+        };
+
+
+        function globalRender(films, ships) {
+            getFilms(films);
+        };
+
+
+        function getFilms(someURL) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', someURL);
+            xhr.send();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    data.results.forEach(obj => {
+                        const url = `${obj.url}`;
+                        const title = obj.title;
+                        allFilmsObj[url] = title;
+                    });
+                    tableRender(firstShipsURL);
+                }
+            };
+        };
+
+
+        function tableRender(first) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', first);
+            xhr.send();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    renderTableHeader(data);
+                }
+            }
+        };
+
+
+        function renderTableHeader(data) {
+            const keyArr = Object.keys(dataMapper(data.results[0], excludes));
+            const tr = document.createElement('tr');
+            tr.classList.add('tableHead');
+            keyArr.forEach(key => {
+                const prettyKey = (key[0].toUpperCase() + key.slice(1))
+                    .split('_')
+                    .join(' ');
+                const td = document.createElement('td');
+                const btn = document.createElement('div');
+                btn.innerHTML = `<input type="button" value="${prettyKey}" class="${key}">`;
+                td.append(btn);
+                tr.append(td);
+
+                allShipsObj.sort[key] = false;
+            });
+            table.append(tr);
+
+            openUrl(firstShipsURL);
+
+            const tableHead = document.querySelector('.tableHead');
+            tableHead.addEventListener('click', (e) => {
+                if (e.target.nodeName === 'INPUT') {
+                    const table = document.querySelectorAll('table tr');
+                    table.forEach((e, i) => {
+                        if (i > 0) {
+                            e.remove();
+                        }
+                    });
+
+                    const className = e.target.className;
+                    if (allShipsObj.sort[className]) {
+                        let temp = Object.assign({}, allShipsObj.results);
+                        allShipsObj.results.reverse();
+
+                        renderTableData(allShipsObj, allFilmsObj);
+                        allShipsObj.sort[className] = !allShipsObj.sort[className];
+                    } else {
+                        allShipsObj.results.sort(function (a, b) {
+                            if (a[className] > b[className]) {
+                                return 1;
+                            }
+                            if (a[className] < b[className]) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+
+                        renderTableData(allShipsObj, allFilmsObj);
+                        allShipsObj.sort[className] = !allShipsObj.sort[className];
+                    }
+                }
+            })
+        };
+
+
+        function openUrl(url) {
+            if (url === null) {
+                console.log('харе');
+                return
+            };
+
+            const table = document.querySelector('table');
+            const div = document.createElement('div');
+            div.innerHTML = `<input type="button" disabled value="Load more..." class="nextBtn">`;
+            table.after(div);
+
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.send();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const res = JSON.parse(xhr.responseText);
+                    const btn = document.querySelector('.nextBtn')
+                    btn.toggleAttribute('disabled');
+
+                    div.addEventListener('click', myFunc);
+
+                    function myFunc() {
+                        div.removeEventListener('click', myFunc);
+                        div.remove();
+                        renderTableData(res, allFilmsObj);
+                        openUrl(res.next);
+                    }
+                };
+            }
+        };
+
+
+        function renderTableData(data, filmsObj) {
+            data.results.forEach(tableRow => {
+                if (!allShipsObj.results.includes(tableRow)) {
+                    allShipsObj.results.push(tableRow);
+                };
+
+                const tr = document.createElement('tr');
+                const tableRowMapped = dataMapper(tableRow, excludes);
+                Object.keys(tableRowMapped).forEach(tableCell => {
+                    if (tableCell === 'films') {
+                        const td = document.createElement('td');
+                        const someArr = tableRowMapped[tableCell].reduce((acum, e) => {
+                            acum.push(filmsObj[e]);
+                            return acum
+                        }, []);
+                        td.innerText = someArr.join(', ');
+                        tr.append(td);
+                    } else {
+                        const td = document.createElement('td');
+                        td.innerText = tableRowMapped[tableCell];
+                        tr.append(td);
+                    }
+                });
+                table.append(tr);
+            });
+
+            console.log(allShipsObj);
+        };
+
+
+        const allFilmsURL = 'https://swapi.co/api/films';
+        const firstShipsURL = 'https://swapi.co/api/starships';
+
+        const allShipsObj = {
+            results: [],
+            sort: []
+
+        };
+        const allFilmsObj = {};
+
+        const excludes = ["created", "edited", "url", "pilots", "MGLT", "max_atmosphering_speed", "hyperdrive_rating"];
+        const table = document.querySelector('table');
+
+        globalRender(allFilmsURL, firstShipsURL);
+    </script>
+
+</body>
+
+</html>
