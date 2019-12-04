@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: rgba(156, 32, 32, 0.3);
+            font-size: 50px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5px;
+
+        }
+
+
+        .box {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .noteInput {
+            width: 400px;
+            height: 45px;
+            margin-right: 20px;
+            font-size: 18px;
+            padding-left: 15px;
+            padding-right: 15px;
+
+        }
+
+        .addNote,
+        .toggleDone {
+            height: 45px;
+            font-size: 18px;
+        }
+
+        .noteList {
+            width: 630px;
+            margin-top: 20px;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .noteList.hideDone .done {
+            display: none;
+        }
+
+        .noteItem {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 5px;
+            font-size: 24px;
+
+        }
+
+        span {
+            padding: 5px;
+        }
+
+        .inputClass {
+
+            font-size: 24px;
+
+            border: 0;
+            outline: none;
+            text-decoration: none;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 2px 0px; /* Параметры тени */
+            font-family: 'Times New Roman', Times, serif;
+            
+
+        }
+
+
+        .options {
+            display: flex;
+            width: 100px;
+            justify-content: space-between;
+
+        }
+
+        .noteItem.done {
+            background: lightgray;
+        }
+
+        .noteItem.done span {
+            text-decoration: line-through;
+        }
+
+
+        .noteItem span {
+            flex-grow: 1;
+            margin-right: 25px;
+        }
+
+        .noteItem div {
+            display: flex;
+            align-items: center;
+        }
+
+
+
+        form {
+            display: flex;
+            flex-direction: row;
+
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        ::placeholder {
+            /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: rgb(112, 111, 111);
+            opacity: 0.6;
+            /* Firefox */
+        }
+    </style>
+
+    <section>
+        <div class="container">
+            <h1>todos</h1>
+            <div class="box">
+                <form>
+                    <input type="text" class="noteInput" placeholder="what should be done?">
+                    <button class="addNote">Add new note</button>
+                    <button type="button" class="toggleDone">Hide done</button>
+                </form>
+                <ul class="noteList">
+                </ul>
+            </div>
+        </div>
+
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+    <script>
+        /*ToDo list
+        Ваши заметки из прошлого задания должны сохраняться в LS, спрашивать подтверждение перед удалением и нужно добавить редактирование*/
+
+
+        const lsData = localStorage.getItem('masterData');
+        const masterData = {
+            notes: lsData ? JSON.parse(lsData).notes : [],
+            isShowDone: lsData ? JSON.parse(lsData).isShowDone : true
+        };
+
+        const form = document.querySelector('form'); // доступ к форме
+        const list = document.querySelector('.noteList'); // доступ к списку
+        const hideButton = document.querySelector('.toggleDone'); // доступ к кнопке hide/show
+        form.children[0].focus(); // фокус на поле ввода
+
+
+        // рендер всего туду листа если чтото есть в LS
+        masterData.notes.forEach(note => {
+            list.innerHTML += notesTemplate(note);
+        }); 
+
+
+        // рендер кнопки hide/show и содержимого туду листа
+        hideButton.innerText = masterData.isShowDone ? 'Hide done' : 'Show done';
+        !masterData.isShowDone && list.classList.add('hideDone');
+
+
+        // функция рендера заметки
+        function notesTemplate({ text, isDone, id }) {
+            const res = `
+                <li data-id="${id}" class="noteItem${isDone ? ' done' : ''}">
+                    <span>${text}</span>
+                    <div class="options">
+                        <input class="checkBoxCls" type="checkbox"${isDone ? ' checked' : ''}>
+                        <button class="editBtn">Edit</button>
+                        <button class="deleteBtn">Delete</button>
+                    </div>
+                </li>
+        `;
+            return res
+        };
+
+        
+        // функция сохранения изменений в localStorage
+        function saveToLS(key = 'masterData', data = masterData) {
+            localStorage.setItem(key, JSON.stringify(data));
+        };
+
+
+        // добавление заметки
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const input = e.target.children[0];
+            const note = {
+                text: input.value,
+                isDone: false,
+                id: moment(new Date).format('x')
+            };
+
+            const checkindex = masterData.notes.findIndex(e => e.text === input.value);
+            if (checkindex >= 0) {
+                errorSound();
+                alert('Такая запись уже есть!');
+                return
+            };
+
+            list.innerHTML += notesTemplate(note);
+            masterData.notes.push(note);
+
+            input.value = '';
+            saveToLS();
+            addNoteSound();
+        });
+
+
+        list.addEventListener('click', e => {
+            const targetEl = e.target;
+            const li = targetEl.closest('.noteItem');
+            const liText = li.children[0].innerText;
+            const elementID = li.dataset.id;
+            const index = masterData.notes.findIndex(note => note.id === elementID);
+
+
+            //doneCheckBox listener
+            if (targetEl.className === 'checkBoxCls') {
+                li.classList.toggle('done');
+                masterData.notes[index].isDone = !masterData.notes[index].isDone;
+                saveToLS();
+            }
+
+            //deleteBtn listener
+            else if (targetEl.className === 'deleteBtn') {
+                const confirmDelete = confirm(`Вы действительно хотите удалить запись '${liText}'`);
+                if (confirmDelete) {
+                    li.remove();
+                    masterData.notes.splice(index, 1);
+                    saveToLS();
+                    deleteNoteSound();
+                };
+            }
+
+            //editBtn listener
+            else if (targetEl.className === 'editBtn') {
+                const task = li.children[0];
+                result = prompt('Редактирование записи', liText);
+                if (result === null) {
+                    return
+                } else if (result === liText) {
+                    errorSound();
+                    alert('Исходная запись равняется новой!');
+                    return
+                } else {
+                    const checkindex = masterData.notes.findIndex(e => e.text === result);
+                    if (checkindex === -1) {
+                        const confirmEditing = confirm(
+                            `Вы действительно хотите изменить запись '${liText}'`);
+                        if (confirmEditing) {
+                            task.innerText = result;
+                            masterData.notes[index].text = result;
+                            saveToLS();
+                        }
+                    } else {
+                        errorSound();
+                        alert('Такая запись уже есть!');
+                        return
+                    }
+                }
+            }
+        });
+
+        // hideButton listener
+        hideButton.addEventListener('click', e => {
+            if (e.target.innerText === 'Hide done') {
+                e.target.innerText = 'Show done';
+                masterData.isShowDone = false;
+                saveToLS();
+            } else if (e.target.innerText === 'Show done') {
+                e.target.innerText = 'Hide done';
+                masterData.isShowDone = true;
+                saveToLS();
+            };
+
+            const list = document.querySelector('.noteList');
+            list.classList.toggle('hideDone');
+        });
+
+
+        //soundEditing
+        function addNoteSound() {
+            const audio = new Audio();
+            audio.src = 'https://soundslibmp3.ru/sounds/1517301916_164.wav';
+            audio.autoplay = true;
+        };
+
+        function deleteNoteSound() {
+            const audio = new Audio();
+            audio.src = 'https://wav-library.net/sounds/0-0-1-4668-20';
+            audio.autoplay = true;
+        };
+
+        function errorSound() {
+            const audio = new Audio();
+            audio.src = 'https://soundslibmp3.ru/sounds/1516737932_1.wav';
+            audio.autoplay = true;
+        };
+
+
+
+        // OPTIONAL
+        //doubleClickEditing listener
+        const edit = document.querySelector('.noteList');
+        edit.addEventListener('dblclick', e => {
+            const targetEl = e.target;
+            console.log(targetEl);
+            
+
+            if (targetEl.nodeName === 'SPAN') {
+                targetEl.innerHTML =
+                    `<input class="inputClass" type="text" size="35" value="${targetEl.innerText}">`;
+
+                document.querySelector('.inputClass').focus();
+                document.querySelector('.inputClass').select();
+
+
+
+
+
+
+
+                // result = prompt('редактирование записи', targetEl.innerText);
+
+
+
+
+                if (result === null) {
+                    return
+                } else if (result === targetEl.innerText) {
+                    errorSound();
+                    alert('Исходная запись равняется новой!');
+                    return
+                } else {
+                    let arrAllSpan = Array.from(document.querySelectorAll('span'));
+                    let index = arrAllSpan.findIndex(e => e.innerText === result);
+                    if (index === -1) {
+                        let confirmEditing = confirm(
+                            `Вы действительно хотите изменить запись '${targetEl.innerText}'`);
+                        if (confirmEditing) {
+                            targetEl.innerText = result;
+                        }
+                    } else {
+                        errorSound();
+                        alert('Такая запись уже есть!');
+                        return
+                    }
+                }
+            }
+        });
+
+
+    </script>
+
+</body>
+
+</html>
