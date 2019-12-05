@@ -24,6 +24,48 @@
         };
 
 
+        function parseTimeString(str) {
+            let k = 1;
+            const [value, period] = str.split(' ');
+
+            switch (period) {
+                case 'year':
+                case 'years':
+                    k = 365 * 24 * 3600 * 1000;
+                    break;
+
+                case 'month':
+                case 'months':
+                    k = 30 * 24 * 3600 * 1000;
+                    break;
+
+                case 'week':
+                case 'weeks':
+                    k = 7 * 3600 * 1000;
+                    break;
+
+                case 'day':
+                case 'days':
+                    k = 24 * 3600 * 1000;
+                    break;
+
+                case 'minute':
+                case 'minutes':
+                    k = 60 * 1000;
+                    break;
+
+                case 'hour':
+                case 'hours':
+                    k = 60 * 60 * 1000;
+                    break;
+
+                default:
+                    break;
+            }
+            return value * k;
+        };
+
+
         function globalRender(films, ships) {
             getFilms(films);
         };
@@ -92,20 +134,43 @@
 
                     const className = e.target.className;
                     if (allShipsObj.sort[className]) {
-                        let temp = Object.assign({}, allShipsObj.results);
                         allShipsObj.results.reverse();
 
                         renderTableData(allShipsObj, allFilmsObj);
                         allShipsObj.sort[className] = !allShipsObj.sort[className];
                     } else {
                         allShipsObj.results.sort(function (a, b) {
-                            if (a[className] > b[className]) {
-                                return 1;
+
+                            const [valueA, periodA] = a[className].split(' ');
+                            const [valueB, periodB] = a[className].split(' ');
+
+                            if (Number(a[className]) && Number(b[className])) {
+                                return Number(a[className]) - Number(b[className]);
+
+                            } else if ((isNaN(valueA) || isNaN(valueB)) === false &&
+                                (isNaN(periodA) || isNaN(periodB)) === true) {
+                                const a2 = parseTimeString(a[className]);
+                                const b2 = parseTimeString(b[className]);
+                                if (a2 > b2) {
+                                    return 1;
+                                }
+                                if (a2 < b2) {
+                                    return -1;
+                                }
+                                return 0;
+
+                            } else {
+                                const a1 = a[className][0].toUpperCase() + a[className].slice(1);
+                                const b1 = b[className][0].toUpperCase() + b[className].slice(1);
+
+                                if (a1 > b1) {
+                                    return 1;
+                                }
+                                if (a1 < b1) {
+                                    return -1;
+                                }
+                                return 0;
                             }
-                            if (a[className] < b[className]) {
-                                return -1;
-                            }
-                            return 0;
                         });
 
                         renderTableData(allShipsObj, allFilmsObj);
@@ -169,7 +234,9 @@
                         tr.append(td);
                     } else {
                         const td = document.createElement('td');
-                        td.innerText = tableRowMapped[tableCell];
+                        const tabEl = tableRowMapped[tableCell];
+                        const prettyTabEl = (tabEl[0].toUpperCase() + tabEl.slice(1));
+                        td.innerText = prettyTabEl;
                         tr.append(td);
                     }
                 });
