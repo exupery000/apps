@@ -41,7 +41,7 @@
 
                 case 'week':
                 case 'weeks':
-                    k = 7 * 3600 * 1000;
+                    k = 7 * 24 * 3600 * 1000;
                     break;
 
                 case 'day':
@@ -141,14 +141,12 @@
                     } else {
                         allShipsObj.results.sort(function (a, b) {
 
-                            const [valueA, periodA] = a[className].split(' ');
-                            const [valueB, periodB] = a[className].split(' ');
-
                             if (Number(a[className]) && Number(b[className])) {
+                                console.log('сортировка чисел');
                                 return Number(a[className]) - Number(b[className]);
 
-                            } else if ((isNaN(valueA) || isNaN(valueB)) === false &&
-                                (isNaN(periodA) || isNaN(periodB)) === true) {
+                            } else if (className === 'consumables') {
+                                console.log('сортировка consumables');
                                 const a2 = parseTimeString(a[className]);
                                 const b2 = parseTimeString(b[className]);
                                 if (a2 > b2) {
@@ -160,6 +158,7 @@
                                 return 0;
 
                             } else {
+                                console.log('сортировка текста');
                                 const a1 = a[className][0].toUpperCase() + a[className].slice(1);
                                 const b1 = b[className][0].toUpperCase() + b[className].slice(1);
 
